@@ -1,11 +1,11 @@
 /*jslint browser: true*/
 /*global Tangram, gui */
 
-map = (function () {
+var map = (function () {
     'use strict';
 
     var map_start_location = [0, 0, 2];
-    var global_min = 0;
+    var global_min = -300;
     var global_max = 8900;
     var uminValue, umaxValue; // storage
     var scene_loaded = false;
@@ -247,7 +247,7 @@ map = (function () {
             scene.requestRedraw();
         });
         // gui.u_min = -10916.;
-        gui.u_min = 0.;
+        gui.u_min = -300.;
         gui.add(gui, 'u_min', -10916., 8848).name("min elevation").onChange(function(value) {
             scene.styles.hillshade.shaders.uniforms.u_min = value;
             scene.requestRedraw();
@@ -256,7 +256,7 @@ map = (function () {
         gui.scaleFactor = 1 +'';
         gui.add(gui, 'scaleFactor').name("z:x scale factor");
 
-        gui.autoexpose = true;
+        gui.autoexpose = false;
         gui.add(gui, 'autoexpose').name("auto-exposure").onChange(function(value) {
             sliderState(!value);
             if (value) {
@@ -277,7 +277,7 @@ map = (function () {
             }
         });
 
-        gui.include_oceans = false;
+        gui.include_oceans = true;
         gui.add(gui, 'include_oceans').name("include ocean data").onChange(function(value) {
             if (value) global_min = -11000;
             else global_min = 0;

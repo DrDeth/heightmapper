@@ -1,16 +1,18 @@
 sources:
     elevation:
         type: Raster
-        url: https://tile.nextzen.org/tilezen/terrain/v1/256/terrarium/{z}/{x}/{y}.png
-        max_zoom: 14
-        url_params:
-            api_key: dmlO1fVQRPKI-GrVIYJ1YA
-    mapzen:
-        type: TopoJSON
-        url: https://tile.nextzen.org/tilezen/vector/v1/256/all/{z}/{x}/{y}.topojson
+        url: https://tile.nextzen.org/tilezen/terrain/v1/512/terrarium/{z}/{x}/{y}.png
+        tile_size: 512
         max_zoom: 16
         url_params:
-            api_key: dmlO1fVQRPKI-GrVIYJ1YA
+            api_key: od_xt-ERSCG1lsRF8IlMvg
+    nextzen:
+        type: MVT
+        url: https://tile.nextzen.org/tilezen/vector/v1/512/all/{z}/{x}/{y}.mvt
+        tile_size: 512
+        max_zoom: 16
+        url_params:
+            api_key: od_xt-ERSCG1lsRF8IlMvg
 styles:
     hillshade:
         base: raster
@@ -18,8 +20,9 @@ styles:
             uniforms:
                 # set desired visible elevation range
                 u_max: 8900. # everest = 8848
-                u_min: 0. # sea level
+                # u_min: 0. # sea level
                 # u_min: -11000. # challenger deep = -10916
+                u_min: -300.
             blocks:
                 global: |
                     float unpack(vec4 h) {
@@ -63,7 +66,7 @@ layers:
             hillshade:
                 order: 0
     water:
-        data: { source: mapzen }
+        data: { source: nextzen }
         draw:
             toggletext:
                 order: 1
@@ -87,10 +90,10 @@ layers:
             draw:
                 togglelines:
                     order: 2
-                    width: .5px
+                    width: 3px
                     color: [0, .5, .5]
     boundaries:
-        data: { source: mapzen }
+        data: { source: nextzen }
         country:
             filter:
                 kind: country
@@ -98,7 +101,7 @@ layers:
                 togglelines:
                     order: 3
                     width: 1px
-                    color: [0, 1, 1]
+                    color: [1, .5, 0]
         state:
             filter:
                 kind: state
@@ -106,16 +109,16 @@ layers:
                 togglelines:
                     order: 3
                     width: 1px
-                    color: [0, .5, .5]
+                    color: [.8, .3, 0]
     roads:
-        data: { source: mapzen }
+        data: { source: nextzen }
         draw:
             togglelines:
                 order: 3
                 width: .25px
-                color: [0, .5, .5]
+                color: [1, .8, .2]
     places:
-        data: { source: mapzen }
+        data: { source: nextzen }
         draw:
             toggletext:
                 order: 4

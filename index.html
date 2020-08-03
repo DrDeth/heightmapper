@@ -145,5 +145,59 @@
     <!-- Demo module -->
     <script src="main.js"></script>
 
+    <!-- Additional drawing -->
+    <script defer>
+        var center;
+        var latScale = 111194.92664454764;
+        var lngScale = 98109.13809763944;
+
+        var rectangle = null;
+
+        function draw8kBox() {
+
+            if (rectangle != null) {
+                rectangle.remove();
+                rectangle = null;
+            }
+
+            let center = map.getCenter();
+            console.log(center);
+
+            let lat1d = { lat: center.lat + 1.0, lng: center.lng };
+            let lng1d = { lat: center.lat, lng: center.lng + 1.0 };
+
+            latScale = center.distanceTo(lat1d);
+            lngScale = center.distanceTo(lng1d);
+
+            let lat8k = 8192.0 / latScale;
+            let lng8k = 8192.0 / lngScale;
+
+            let halfLat = lat8k / 2.0;
+            let halfLng = lat8k / 2.0;
+            
+            let corner1 = [ center.lat - halfLat, center.lng - halfLng ];
+            let corner2 = [ center.lat + halfLat, center.lng + halfLng ];
+            
+            // define rectangle geographical bounds
+            var bounds = [corner1, corner2];
+
+            // create an orange rectangle
+            rectangle = L.rectangle(bounds, {color: "#ff7800", weight: 1}).addTo(map);
+        }
+
+        (function(){
+            if (map) {
+                
+                
+                map.on("moveend", function (e) {
+                    draw8kBox();
+                });
+
+            }
+            else {
+                console.log('No map');
+            }
+        }());
+    </script>
   </body>
 </html>
