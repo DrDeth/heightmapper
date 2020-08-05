@@ -85,6 +85,24 @@
             -webkit-box-shadow: 0 0 1px rgba(255,255,255,.5);
         }
 
+        #map-coords {
+            display: block;
+            position: absolute;
+            top: 10px;
+            left: 100px;
+            border: 1px solid #234;
+            background-color: rgba(48, 64, 96, 0.8);
+            color:rgb(92, 128, 192);
+            padding: 2px;
+            text-align: center;
+            width: 200px;
+            height: 20px;
+            line-height: 20px;
+            font-size: 14px;
+            z-index: 10;
+
+        }
+
     </style>
   </head>
 
@@ -92,7 +110,7 @@
     <div id="new-wrapper">
         <div id="new">
             <ul>
-            <li><span style="color: #ee0000">NEW!</span> Enter your API key in the field provided to load terrain imagery past zoom level 3. <a style="color: #ee0000" href="http://mapzen.com/developers">Get your free API key here!</a></li>
+            <li><span style="color: #ee0000">NEW!</span> Enter your API key in the field provided to load terrain imagery past zoom level 3. <a style="color: #ee0000" href="https://developers.nextzen.org/">Get your free API key here!</a></li>
             </ul>
         </div>
     </div>
@@ -127,6 +145,7 @@
         </div>
     </div>
     <div id="help-blocker"></div>
+    <div id="map-coords"></div>
     <div id="map"></div>
 
     <!-- 3rd party libraries -->
@@ -152,6 +171,11 @@
         var lngScale = 98109.13809763944;
 
         var rectangle = null;
+        var corner1 = [];
+        var corner2 = [];
+        var bounds = [];
+
+        var coordEl = null;
 
         function draw8kBox() {
 
@@ -162,6 +186,10 @@
 
             let center = map.getCenter();
             console.log(center);
+
+            if (coordEl != null) {
+                coordEl.innerText = center.lat.toFixed(4) + ',' + center.lng.toFixed(4);
+            }
 
             let lat1d = { lat: center.lat + 1.0, lng: center.lng };
             let lng1d = { lat: center.lat, lng: center.lng + 1.0 };
@@ -175,24 +203,43 @@
             let halfLat = lat8k / 2.0;
             let halfLng = lat8k / 2.0;
             
-            let corner1 = [ center.lat - halfLat, center.lng - halfLng ];
-            let corner2 = [ center.lat + halfLat, center.lng + halfLng ];
+            corner1 = [ center.lat - halfLat, center.lng - halfLng ];
+            corner2 = [ center.lat + halfLat, center.lng + halfLng ];
             
             // define rectangle geographical bounds
-            var bounds = [corner1, corner2];
+            bounds = [corner1, corner2];
 
             // create an orange rectangle
             rectangle = L.rectangle(bounds, {color: "#ff7800", weight: 1}).addTo(map);
         }
 
+        function setContentChangeListener (el, listener) {
+            el.addEventListener("blur", listener);
+            el.addEventListener("keyup", listener);
+            el.addEventListener("paste", listener);
+            el.addEventListener("copy", listener);
+            el.addEventListener("cut", listener);
+            el.addEventListener("delete", listener);
+            el.addEventListener("mouseup", listener);
+        }
+
         (function(){
-            if (map) {
-                
-                
+            coordEl = document.getElementById('map-coords');
+            coordEl.contentEditable = true;
+            setContentChangeListener(coordEl, function() {
+                console.log('contentEditible change');
+                let coord = coordEl.innerText.split(',');
+                if (coord.length == 2) {
+                    if (map) {
+                        map.flyTo([coord[0], coord[1]], 12);
+                    }
+                }
+            });
+
+            if (map) {                
                 map.on("moveend", function (e) {
                     draw8kBox();
                 });
-
             }
             else {
                 console.log('No map');
